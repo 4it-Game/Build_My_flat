@@ -11,9 +11,20 @@ public class Genarator : MonoBehaviour
 
 	public bool lost = false;
 
+	private Transform Cam;
+
+	public float CurDistance;
+
+	public float StartDistance;
+
+	public bool MoveCam = false;
+
 	void Start ()
 	{
 		StartCoroutine (WaitandSpawn (SpawnTime));
+		Cam = Camera.main.transform;
+		StartDistance = Vector3.Distance (transform.position, GameObject.FindGameObjectWithTag ("Ground").transform.position);
+		CurDistance = StartDistance + 3;
 	}
 
 
@@ -26,7 +37,15 @@ public class Genarator : MonoBehaviour
 
 			if (Input.GetKey (KeyCode.LeftArrow)) {
 				SelectedObject.transform.Translate (Vector3.left * Speed * Time.deltaTime);
-			}			
+			}
+			if (SelectedObject != null) {
+				CurDistance = Vector3.Distance (transform.position, SelectedObject.transform.position);
+			}
+			if (CurDistance < StartDistance && MoveCam == true) {
+				Cam.Translate (Vector3.up * Time.deltaTime);
+			} else {
+				MoveCam = false;
+			}
 		}
 	}
 
@@ -41,6 +60,9 @@ public class Genarator : MonoBehaviour
 		Cube.transform.localScale = new Vector3 (Random.Range (1, 3), Random.Range (1, 3), 1);
 		Cube.AddComponent<AddPoints> ();
 		Cube.tag = "Active";
+		if (CurDistance < StartDistance) {
+			MoveCam = true;
+		}
 		if (SelectedObject != null && SelectedObject.tag == "Active") {
 			lost = true;
 		} 
